@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["hamdi_amiche@outlook.fr"]
 
   spec.summary       = %q{a gem to give permission access to users looknig back to their roles}
-  spec.description   = %q{RBACan is a gem that provides security to your application functionnalities by a simple method can()}
+  spec.description   = %q{RBACan is a Role-based access control tool to control user access to the functionnalities of your application}
   spec.homepage      = "https://github.com/hamdi777/RBACan"
   spec.license       = "MIT"
 

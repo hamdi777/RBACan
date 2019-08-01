@@ -1,6 +1,6 @@
 # Rbacan
 
-a Role-based access control tool to manipulate user access to the functionnalities of your application
+a Role-based access control tool to control user access to the functionnalities of your application
 
 ## Installation
 
