@@ -22,7 +22,27 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+run rails generate rbacan:install
+
+- create your roles and permissions in your seed with these helpers 
+
+for roles:
+
+create_roles(role_array)
+
+for permissions:
+
+create_permissions(permissions_array)
+
+- then assign permissions to each role with in your seed also with this helper
+
+assign_permissions_to_role(role_name, permissions_array)
+
+- last thing is going to be assigning roles to users u can do this by
+
+user = current_user
+user.assign_role(role_name)
+
 
 ## Development
 
