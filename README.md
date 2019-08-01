@@ -26,22 +26,22 @@ run rails generate rbacan:install
 
 - create your roles and permissions in your seed with these helpers 
 
-for roles:
+    for roles:
 
-create_roles(role_array)
+    create_roles(roles_array)
 
-for permissions:
+    for permissions:
 
-create_permissions(permissions_array)
+    create_permissions(permissions_array)
 
 - then assign permissions to each role with in your seed also with this helper
 
-assign_permissions_to_role(role_name, permissions_array)
+    assign_permissions_to_role(role_name, permissions_array)
 
 - last thing is going to be assigning roles to users u can do this by
 
-user = current_user
-user.assign_role(role_name)
+    user = current_user
+    user.assign_role(role_name)
 
 
 ## Development
@@ -52,7 +52,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rbacan. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/hamdi777/rbacan. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
