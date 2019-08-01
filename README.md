@@ -24,19 +24,24 @@ run rails generate rbacan:install
 
 - copy the content in the generated file db/copy_to_seed.rb in your seeds.rb file
     you have there all the tools you need to create you roles and permissions
-- if you want to assign a role to a user it is simple you just have to do so:
+if you want to assign a role to a user it is simple you just have to do so:
+
     user = current_user
     user.assign_role(role_name)
-- to remove a role from user do this:
+-to remove a role from user do this:
+
     user.remove_user_role(role_name)
 
-- now when you want to test if a user have access       to a functionnality use this:
+now when you want to test if a user have access to a functionnality use this:
+
     user.can?(permission_name)
 
-- add this line to your user model 
+add this line to your user model:
+
     include Rbacan::Permittable
 
-- run rails db:migrate
+run:
+    rails db:migrate
 
 - enjoy :D
 ## Development
