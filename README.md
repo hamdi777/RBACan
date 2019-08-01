@@ -44,7 +44,7 @@ add this line to your user model:
     include Rbacan::Permittable
 
 run:
-    rails db:migrate
+    bin/rails db:migrate
 
 enjoy :D
 ## Development
