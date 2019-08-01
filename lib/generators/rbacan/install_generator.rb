@@ -19,6 +19,10 @@ module Rbacan
         migration_template "create_role_permissions.rb", "db/migrate/create_role_permissions.rb"
         migration_template "create_user_roles.rb", "db/migrate/create_user_roles.rb"
       end
+
+      def copy_seed
+        copy_file 'copy_to_seeds.rb', "db/copy_to_seeds.rb"
+      end
     end
   end
 end

@@ -1,8 +1,6 @@
 # Rbacan
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rbacan`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+a Role-based access control tool to manipulate user access to the functionnalities of your application
 
 ## Installation
 
@@ -24,26 +22,23 @@ Or install it yourself as:
 
 run rails generate rbacan:install
 
-- create your roles and permissions in your seed with these helpers 
-
-    for roles:
-
-    create_roles(roles_array)
-
-    for permissions:
-
-    create_permissions(permissions_array)
-
-- then assign permissions to each role with in your seed also with this helper
-
-    assign_permissions_to_role(role_name, permissions_array)
-
-- last thing is going to be assigning roles to users u can do this by
-
+- copy the content in the generated file db/copy_to_seed.rb in your seeds.rb file
+    you have there all the tools you need to create you roles and permissions
+- if you want to assign a role to a user it is simple you just have to do so:
     user = current_user
     user.assign_role(role_name)
+- to remove a role from user do this:
+    user.remove_user_role(role_name)
 
+- now when you want to test if a user have access       to a functionnality use this:
+    user.can?(permission_name)
 
+- add this line to your user model 
+    include Rbacan::Permittable
+
+- run rails db:migrate
+
+- enjoy :D
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

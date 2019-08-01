@@ -8,8 +8,18 @@ module Rbacan
 
             has_many :user_roles, class_name: Rbacan.user_role_class, dependent: :destroy
             has_many :roles, class_name: Rbacan.role_class, through: :user_roles
-            
-            def can_by_permission?(permission)
+
+            def assign_role_to_user(role_name)
+                assigned_role = Rbacan::Role.find_by_name(role_name)
+                Rbacan::UserRole.create(user_id: self.id, role_id: assigned_role.id)
+            end
+
+            def remove_user_role(role_name)
+                removed_role = Rbacan::Role.find_by_name(role_name)
+                Rbacan::UserRole.where(user_id: self.id, role_id: removed_role.id).destroy_all
+            end
+
+            def can?(permission)
                 @user_roles = self.roles
                 user_permission = Rbacan::Permission.find_by_name(permission)
                 if user_permission && @user_roles.joins(:role_permissions).where(role_permissions: {permission_id: user_permission.id}).count > 0

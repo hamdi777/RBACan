@@ -1,6 +1,7 @@
 require "rbacan/version"
 require "rbacan/permittable"
 require 'rbacan/engine'
+require "rbacan/roles_and_permissions"
 
 module Rbacan
   mattr_accessor :permittable_class
