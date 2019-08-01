@@ -20,7 +20,9 @@ Or install it yourself as:
 
 ## Usage
 
+```ruby
 run rails generate rbacan:install
+```
 
 copy the content in the generated file db/copy_to_seed.rb in your seeds.rb file
 you have there all the tools you need to create you roles and permissions
@@ -44,7 +46,10 @@ add this line to your user model:
     include Rbacan::Permittable
 
 run:
+```ruby
     rails db:migrate
+    rails db:seed
+```
 
 enjoy :D
 ## Development
