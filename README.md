@@ -33,7 +33,7 @@ if you want to assign a role to a user it is simple you just have to do so:
 
 to remove a role from user do this:
 
-    user.remove_user_role(role_name)
+    user.remove_role(role_name)
 
 now when you want to test if a user have access to a functionnality use this:
 

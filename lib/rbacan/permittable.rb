@@ -14,7 +14,7 @@ module Rbacan
                 Rbacan::UserRole.create(user_id: self.id, role_id: assigned_role.id)
             end
 
-            def remove_user_role(role_name)
+            def remove_role(role_name)
                 removed_role = Rbacan::Role.find_by_name(role_name)
                 Rbacan::UserRole.where(user_id: self.id, role_id: removed_role.id).destroy_all
             end
