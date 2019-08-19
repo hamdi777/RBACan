@@ -8,6 +8,6 @@ module Rbacan
         has_many :permissions, class_name: Rbacan.permission_class, through: :role_permissions
 
         has_many :user_roles, class_name: Rbacan.user_role_class, dependent: :destroy
-        has_many :users, through: :user_roles
+        has_many :users, class_name: Rbacan.permittable_class, through: :user_roles
     end
 end
