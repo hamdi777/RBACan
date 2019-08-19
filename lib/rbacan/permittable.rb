@@ -9,7 +9,7 @@ module Rbacan
             has_many :user_roles, class_name: Rbacan.user_role_class, dependent: :destroy
             has_many :roles, class_name: Rbacan.role_class, through: :user_roles
 
-            def assign_role_to_user(role_name)
+            def assign_role(role_name)
                 assigned_role = Rbacan::Role.find_by_name(role_name)
                 Rbacan::UserRole.create(user_id: self.id, role_id: assigned_role.id)
             end

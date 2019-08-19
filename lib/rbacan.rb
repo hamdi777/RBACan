@@ -43,7 +43,7 @@ module Rbacan
     @@role_permission_class.create(role_id: chosen_role.id, perm_id: given_permission.id)
   end
 
-  def assign_role_to_user(role_name)
+  def assign_role(role_name)
       assigned_role = Role.find_by_name(role_name)
       @@user_role_class.create(user_id: self.id, role_id: assigned_role.id)
   end
