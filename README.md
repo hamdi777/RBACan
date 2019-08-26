@@ -27,6 +27,14 @@ run rails generate rbacan:install
 copy the content in the generated file db/copy_to_seed.rb in your seeds.rb file
 you have there all the tools you need to create you roles and permissions
 
+You might need to configure you user class_name if you're using a different class_name for the user, go to rbacan.rb in your initializers folder and make your change
+
+```ruby
+    Rbacan.configure do |config|
+    config.permittable_class = "YOUR USER CLASS_NAME"
+    end
+```
+
 if you want to assign a role to a user it is simple you just have to do so:
 
     user = current_user
@@ -46,12 +54,14 @@ add this line to your user model:
     include Rbacan::Permittable
 
 run:
+
 ```ruby
     rails db:migrate
     rails db:seed
 ```
 
 enjoy :D
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
