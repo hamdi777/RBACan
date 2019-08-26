@@ -23,6 +23,10 @@ module Rbacan
       def copy_seed
         copy_file 'copy_to_seeds.rb', "db/copy_to_seeds.rb"
       end
+
+      def copy_initializer
+        copy_file 'rbacan.rb', 'config/initializers/rbacan.rb'
+      end
     end
   end
 end

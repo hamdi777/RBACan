@@ -5,9 +5,7 @@ require "rbacan/roles_and_permissions"
 
 module Rbacan
   mattr_accessor :permittable_class
-  # mattr_accessor :permittable_table
   @@permittable_class = 'User'
-  # @@permittable_table = @@permittable_class.tableize
 
   mattr_accessor :role_class
   mattr_accessor :role_table
@@ -51,6 +49,10 @@ module Rbacan
   def remove_user_role(role_name)
       removed_role = Role.find_by_name(role_name)
       @@user_role_class.where(user_id: self.id, role_id: removed_role.id).destroy_all
+  end
+
+  def self.configure(&block)
+    yield self
   end
 
   class Error < StandardError; end
