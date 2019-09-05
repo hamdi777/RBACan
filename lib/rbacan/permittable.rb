@@ -11,7 +11,8 @@ module Rbacan
 
             def assign_role(role_name)
                 assigned_role = Rbacan::Role.find_by_name(role_name)
-                Rbacan::UserRole.create(user_id: self.id, role_id: assigned_role.id)
+                self.user_roles.new(role_id: assigned_role.id)
+                self.save if self.persisted?
             end
 
             def remove_role(role_name)
