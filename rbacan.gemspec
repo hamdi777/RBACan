@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{a gem to give permission access to users looknig back to their roles}
   spec.description   = %q{RBACan is a Role-based access control tool to control user access to the functionnalities of your application}
   spec.homepage      = "https://github.com/hamdi777/RBACan"
-  spec.license       = "MIT"
+  spec.licenses      = ["MIT"]
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
