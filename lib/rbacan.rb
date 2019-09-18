@@ -43,7 +43,7 @@ module Rbacan
 
   def assign_role(role_name)
       assigned_role = Role.find_by_name(role_name)
-      @@user_role_class.create(user_id: self.id, role_id: assigned_role.id)
+      @@user_role_class.find_or_create_by(user_id: self.id, role_id: assigned_role.id)
   end
 
   def remove_user_role(role_name)
