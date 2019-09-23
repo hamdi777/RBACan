@@ -41,16 +41,6 @@ module Rbacan
     @@role_permission_class.create(role_id: chosen_role.id, perm_id: given_permission.id)
   end
 
-  def assign_role(role_name)
-      assigned_role = Role.find_by_name(role_name)
-      @@user_role_class.find_or_create_by(user_id: self.id, role_id: assigned_role.id)
-  end
-
-  def remove_user_role(role_name)
-      removed_role = Role.find_by_name(role_name)
-      @@user_role_class.where(user_id: self.id, role_id: removed_role.id).destroy_all
-  end
-
   def self.configure(&block)
     yield self
   end

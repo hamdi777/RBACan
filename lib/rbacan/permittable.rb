@@ -7,11 +7,12 @@ module Rbacan
         included do
 
             has_many :user_roles, class_name: Rbacan.user_role_class, dependent: :destroy
+            accepts_nested_attributes_for :user_roles
             has_many :roles, class_name: Rbacan.role_class, through: :user_roles
 
             def assign_role(role_name)
                 assigned_role = Rbacan::Role.find_by_name(role_name)
-                self.user_roles.find_or_create_by(role_id: assigned_role.id)
+                self.user_roles.new(role_id: assigned_role.id)
                 self.save if self.persisted?
             end
 
