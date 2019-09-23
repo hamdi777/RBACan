@@ -12,7 +12,7 @@ module Rbacan
 
             def assign_role(role_name)
                 assigned_role = Rbacan::Role.find_by_name(role_name)
-                self.user_roles.new(role_id: assigned_role.id)
+                self.user_roles.find_or_initialize_by(role_id: assigned_role.id)
                 self.save if self.persisted?
             end
 
