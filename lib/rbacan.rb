@@ -1,7 +1,11 @@
 require "rbacan/version"
+require "rbacan/not_authorized"
 require "rbacan/permittable"
-require 'rbacan/engine'
+require "rbacan/engine"
 require "rbacan/roles_and_permissions"
+require "rbacan/authorization"
+require "rbacan/view_helpers"
+require "rbacan/route_constraint"
 
 module Rbacan
   mattr_accessor :permittable_class
@@ -27,18 +31,29 @@ module Rbacan
   @@role_permission_class = 'Rbacan::RolePermission'
   @@role_permission_table = 'role_permissions'
 
-  def create_role(role_name)
-    @@role_class.create(name: role_name)
+  # :raise (default), :redirect, or any callable (lambda/proc).
+  mattr_accessor :unauthorized_handler
+  @@unauthorized_handler = :raise
+
+  # Redirect path used when unauthorized_handler is :redirect.
+  mattr_accessor :unauthorized_redirect_path
+  @@unauthorized_redirect_path = '/'
+
+  def self.create_role(role_name)
+    @@role_class.constantize.create(name: role_name)
   end
 
-  def create_permission(permission_name)
-    @@permission_class.create(name: permission_name)
+  def self.create_permission(permission_name)
+    @@permission_class.constantize.create(name: permission_name)
   end
 
-  def assign_permission_to_role(role_name, permission_name)
-    chosen_role = @@role_class.find_by_name(role_name)
-    given_permission = @@permission_class.find_by_name(permission_name)
-    @@role_permission_class.create(role_id: chosen_role.id, perm_id: given_permission.id)
+  def self.assign_permission_to_role(role_name, permission_name)
+    chosen_role      = @@role_class.constantize.find_by_name(role_name)
+    given_permission = @@permission_class.constantize.find_by_name(permission_name)
+    @@role_permission_class.constantize.create(
+      role_id:       chosen_role.id,
+      permission_id: given_permission.id
+    )
   end
 
   def self.configure(&block)
@@ -46,5 +61,4 @@ module Rbacan
   end
 
   class Error < StandardError; end
-  # Your code goes here...
 end
