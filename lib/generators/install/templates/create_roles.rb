@@ -1,9 +1,11 @@
-class CreateRoles < ActiveRecord::Migration[5.2]
-    def change
-        create_table :roles do |t|
-            t.string :name
-      
-            t.timestamps
-        end
+class CreateRoles < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+  def change
+    create_table :roles do |t|
+      t.string :name, null: false
+
+      t.timestamps
     end
+
+    add_index :roles, :name, unique: true
+  end
 end
