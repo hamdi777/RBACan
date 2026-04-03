@@ -17,7 +17,6 @@ Gem::Specification.new do |spec|
   if spec.respond_to?(:metadata)
     spec.metadata["allowed_push_host"] = "https://rubygems.org"
     spec.metadata["homepage_uri"]      = spec.homepage
-    spec.metadata["source_code_uri"]   = "https://github.com/hamdi777/RBACan"
     spec.metadata["changelog_uri"]     = "https://github.com/hamdi777/RBACan/blob/master/CHANGELOG.md"
   else
     raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
@@ -29,14 +28,15 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.required_ruby_version = ">= 3.0"
 
-  spec.add_dependency 'rails', '>= 5.2'
+  spec.add_dependency 'rails', '~> 5.2'
 
-  spec.add_development_dependency "bundler",      ">= 2.0"
+  spec.add_development_dependency "bundler",      "~> 2.0"
   spec.add_development_dependency "rake",         "~> 13.0"
   spec.add_development_dependency "rspec",        "~> 3.0"
   spec.add_development_dependency "generator_spec", "~> 0.9.4"
-  spec.add_development_dependency "railties",     ">= 5.2"
-  spec.add_development_dependency "activerecord", ">= 5.2"
-  spec.add_development_dependency "sqlite3",      ">= 1.4"
+  spec.add_development_dependency "railties",     "~> 5.2"
+  spec.add_development_dependency "activerecord", "~> 5.2"
+  spec.add_development_dependency "sqlite3",      "~> 1.4"
 end
