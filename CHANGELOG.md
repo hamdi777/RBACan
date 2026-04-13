@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-04-13
+
+### Added
+
+- `primary_key_type` config option — auto-detects host app's primary key type (supports `:uuid` and `:bigint`)
+- `tenant_scoped` config option — when `true`, adds `tenant_id` to `roles` and `user_roles` tables
+- `tenant_class` config option — configurable tenant model class name (default: `"Tenant"`)
+- `Rbacan.resolve_primary_key_type` — helper to resolve the effective PK type at runtime
+- Tenant-aware methods on `Permittable`:
+  - `roles_for_tenant(tenant_id)` — returns roles assigned in a specific tenant (+ global)
+  - `has_role_in_tenant?(role_name, tenant_id)` — checks role in tenant context
+  - `can_in_tenant?(permission_name, tenant_id)` — checks permission in tenant context
+- `assign_role` now accepts optional `tenant_id:` keyword argument for tenant-scoped assignments
+- `remove_role` now accepts optional `tenant_id:` keyword argument
+- `Role` scopes: `.global` (where tenant_id IS NULL), `.for_tenant(tenant_id)` (tenant + global roles)
+- `Role` model: conditional `belongs_to :tenant` when `tenant_scoped` is enabled
+- `UserRole` model: conditional `belongs_to :tenant` when `tenant_scoped` is enabled
+- Initializer template now documents all new configuration options
+- Migration templates now use explicit `type:` on `t.references` for FK columns
+
+### Fixed
+
+- `t.bigint :user_id` was hardcoded in `create_user_roles` migration — now uses `t.references :user` with proper type detection matching the host app's PK type
+- Migration templates now conditionally pass `id: :uuid` to `create_table` based on host app configuration
+- `create_role_permissions` migration now specifies explicit `type:` on foreign key references
+
+---
+
 ## [0.3.0] - 2026-03-31
 
 ### Added

@@ -14,6 +14,21 @@ Rbacan.configure do |config|
   # config.user_role_table        = "user_roles"
   # config.role_permission_table  = "role_permissions"
 
+  # Primary key type for generated migrations.
+  # Set to :uuid if your app uses UUID primary keys.
+  # When nil, auto-detects from your Rails generator config (primary_key_type).
+  # config.primary_key_type = :uuid
+
+  # Enable tenant scoping for roles and user_roles.
+  # When true, adds tenant_id to the roles and user_roles tables,
+  # allowing tenant-specific roles and role assignments.
+  # Permissions always remain global regardless of this setting.
+  # config.tenant_scoped = false
+
+  # The name of your tenant model class (default: "Tenant").
+  # Only used when tenant_scoped is true.
+  # config.tenant_class = "Tenant"
+
   # Authorization failure handling:
   #   :raise    — raises Rbacan::NotAuthorized (default)
   #   :redirect — redirects to unauthorized_redirect_path

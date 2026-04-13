@@ -1,11 +1,11 @@
-require "rbacan/version"
-require "rbacan/not_authorized"
-require "rbacan/permittable"
-require "rbacan/engine"
-require "rbacan/roles_and_permissions"
-require "rbacan/authorization"
-require "rbacan/view_helpers"
-require "rbacan/route_constraint"
+require 'rbacan/version'
+require 'rbacan/not_authorized'
+require 'rbacan/permittable'
+require 'rbacan/engine'
+require 'rbacan/roles_and_permissions'
+require 'rbacan/authorization'
+require 'rbacan/view_helpers'
+require 'rbacan/route_constraint'
 
 module Rbacan
   mattr_accessor :permittable_class
@@ -39,6 +39,33 @@ module Rbacan
   mattr_accessor :unauthorized_redirect_path
   @@unauthorized_redirect_path = '/'
 
+  # Primary key type for generated migrations.
+  # nil = auto-detect from Rails generator config (primary_key_type).
+  # Set to :uuid for UUID primary keys, or :bigint for standard integer keys.
+  mattr_accessor :primary_key_type
+  @@primary_key_type = nil
+
+  # When true, adds tenant_id to roles and user_roles tables,
+  # enabling tenant-scoped roles and role assignments.
+  # Permissions remain global (no tenant_id) regardless of this setting.
+  mattr_accessor :tenant_scoped
+  @@tenant_scoped = false
+
+  # The name of your tenant model class (default: "Tenant").
+  # Only used when tenant_scoped is true.
+  mattr_accessor :tenant_class
+  @@tenant_class = 'Tenant'
+
+  # Resolves the effective primary key type.
+  # Checks the explicit config first, then falls back to the Rails generator config.
+  def self.resolve_primary_key_type
+    return primary_key_type if primary_key_type.present?
+
+    Rails.configuration.generators.options.dig(:active_record, :primary_key_type)
+  rescue StandardError
+    nil
+  end
+
   def self.create_role(role_name)
     @@role_class.constantize.create(name: role_name)
   end
@@ -51,12 +78,12 @@ module Rbacan
     chosen_role      = @@role_class.constantize.find_by_name(role_name)
     given_permission = @@permission_class.constantize.find_by_name(permission_name)
     @@role_permission_class.constantize.create(
-      role_id:       chosen_role.id,
+      role_id: chosen_role.id,
       permission_id: given_permission.id
     )
   end
 
-  def self.configure(&block)
+  def self.configure
     yield self
   end
 
