@@ -169,7 +169,7 @@ end
 
 ## Defining Roles and Permissions
 
-Use the `Rbacan::RolesAndPermissions` module in your seeds. All methods are idempotent — safe to run multiple times.
+In legacy mode, use the `Rbacan::RolesAndPermissions` module in your seeds. All methods are idempotent — safe to run multiple times. Hardened mode rejects these unscoped helpers; host-owned applications must seed their own scoped authorization records.
 
 ```ruby
 # db/seeds.rb

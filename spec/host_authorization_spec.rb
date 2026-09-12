@@ -254,6 +254,18 @@ RSpec.describe 'host-owned authorization' do
   end
 
   it 'blocks destructive and unscoped legacy APIs unless the host opts in' do
+    expect { Rbacan.create_role(:admin) }
+      .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
+    expect { Rbacan.create_permission(:edit_post) }
+      .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
+    expect { Rbacan.assign_permission_to_role(:admin, :edit_post) }
+      .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
+    expect { Rbacan::RolesAndPermissions.create_roles([:admin]) }
+      .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
+    expect { Rbacan::RolesAndPermissions.create_permissions([:edit_post]) }
+      .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
+    expect { Rbacan::RolesAndPermissions.assign_permissions_to_role(:admin, [:edit_post]) }
+      .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
     expect { user.assign_role(:admin) }
       .to raise_error(Rbacan::UnsafeLegacyApi, /legacy_mode/)
     expect { user.remove_role(:admin) }
@@ -305,6 +317,7 @@ RSpec.describe 'host-owned authorization' do
   end
 
   it 'supports host role and permission key columns' do
+    Rbacan.legacy_mode = true
     coded_role_class = Class.new(ActiveRecord::Base) do
       self.table_name = 'coded_roles'
     end

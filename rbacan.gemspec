@@ -20,7 +20,11 @@ Gem::Specification.new do |spec|
   spec.metadata['changelog_uri']     = 'https://github.com/hamdi777/RBACan/blob/master/CHANGELOG.md'
 
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+    release_documents = %w[CHANGELOG.md CODE_OF_CONDUCT.md LICENSE.txt README.md]
+
+    `git ls-files -z`.split("\x0").select do |file|
+      file.match?(%r{\A(?:app|lib)/}) || release_documents.include?(file)
+    end
   end
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.5.0] - Unreleased
+## [0.5.0] - 2026-09-12
 
 ### Added
 
@@ -16,16 +16,16 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Hardened mode is the default. Authorization requires an explicit context and fails closed without a host adapter.
-- Destructive/unscoped `Rbacan::Permittable` APIs require explicit `legacy_mode = true` opt-in.
+- Destructive/unscoped `Rbacan::Permittable`, catalog, role-permission, and seed-helper APIs require explicit `legacy_mode = true` opt-in.
 - Authorization contexts require a tenant and snapshot/freeze JSON-like tenant, property, vertical, and subject identifiers plus their timestamp.
 - Controller and view authorization use the host adapter in hardened mode.
 - Hardened redirect denials resolve their stable code through the host I18n backend.
 - Assignment dispatch rejects missing users or blank roles before invoking the host adapter.
+- Gem packaging uses an explicit runtime/documentation allowlist and excludes repository-only files.
 
 ### Compatibility
 
 - Applications using the generated 0.4 schema must consciously enable legacy mode while migrating.
-- No 0.5 artifact has been published yet.
 
 ## [0.4.0] - 2026-04-13
 

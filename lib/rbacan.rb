@@ -83,14 +83,20 @@ module Rbacan
   end
 
   def self.create_role(role_name)
+    ensure_legacy_mode!(:create_role)
+
     @@role_class.constantize.create(@@role_key => role_name.to_s)
   end
 
   def self.create_permission(permission_name)
+    ensure_legacy_mode!(:create_permission)
+
     @@permission_class.constantize.create(@@permission_key => permission_name.to_s)
   end
 
   def self.assign_permission_to_role(role_name, permission_name)
+    ensure_legacy_mode!(:assign_permission_to_role)
+
     chosen_role = @@role_class.constantize.find_by(@@role_key => role_name.to_s)
     given_permission = @@permission_class.constantize.find_by(@@permission_key => permission_name.to_s)
     @@role_permission_class.constantize.create(
