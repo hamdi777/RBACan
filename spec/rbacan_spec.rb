@@ -1,6 +1,6 @@
 RSpec.describe Rbacan do
   it 'has a version number' do
-    expect(Rbacan::VERSION).to eq('0.4.0')
+    expect(Rbacan::VERSION).to eq('0.5.0')
   end
 end
 
@@ -208,11 +208,14 @@ RSpec.describe Rbacan::Authorization do
 
     context 'when unauthorized_handler is :redirect' do
       around do |example|
-        original = Rbacan.unauthorized_handler
+        original_handler = Rbacan.unauthorized_handler
+        original_path = Rbacan.unauthorized_redirect_path
         Rbacan.unauthorized_handler = :redirect
         Rbacan.unauthorized_redirect_path = '/login'
         example.run
-        Rbacan.unauthorized_handler = original
+      ensure
+        Rbacan.unauthorized_handler = original_handler
+        Rbacan.unauthorized_redirect_path = original_path
       end
 
       it 'redirects instead of raising' do

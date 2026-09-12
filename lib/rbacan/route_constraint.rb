@@ -1,30 +1,22 @@
 module Rbacan
   class RouteConstraint
-    # Constrains routes to users that have a given role or permission.
-    #
-    # Usage in config/routes.rb:
-    #   constraints Rbacan::RouteConstraint.new(role: :admin) do
-    #     namespace :admin do
-    #       resources :users
-    #     end
-    #   end
-    #
-    #   constraints Rbacan::RouteConstraint.new(permission: :access_admin_panel) do
-    #     ...
-    #   end
-    def initialize(role: nil, permission: nil)
+    def initialize(role: nil, permission: nil, user_resolver: nil, context_resolver: nil)
       if role.nil? && permission.nil?
-        raise ArgumentError, "Provide exactly one of role: or permission:"
+        raise ArgumentError, 'Provide exactly one role: or permission:'
       end
       if role && permission
-        raise ArgumentError, "Provide exactly one of role: or permission:, not both"
+        raise ArgumentError, 'Provide exactly one role: or permission:, not both'
       end
 
-      @role       = role&.to_s
+      @role = role&.to_s
       @permission = permission&.to_s
+      @user_resolver = user_resolver
+      @context_resolver = context_resolver
     end
 
     def matches?(request)
+      return hardened_match?(request) unless Rbacan.legacy_mode
+
       user = current_user_from(request)
       return false unless user
 
@@ -33,12 +25,23 @@ module Rbacan
 
     private
 
+    def hardened_match?(request)
+      return false unless @user_resolver&.respond_to?(:call) && @context_resolver&.respond_to?(:call)
+
+      Rbacan.authorized?(
+        user: @user_resolver.call(request),
+        permission: @permission,
+        role: @role,
+        context: @context_resolver.call(request)
+      )
+    rescue Rbacan::ConfigurationError, ArgumentError
+      false
+    end
+
     def current_user_from(request)
-      # Warden (Devise) path — most common, no extra query needed.
       warden = request.env['warden']
       return warden.user if warden&.authenticated?
 
-      # Fallback: manual session lookup for apps not using Warden.
       user_id = request.session[:user_id] || request.session['user_id']
       return nil unless user_id
 

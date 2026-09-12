@@ -38,6 +38,60 @@ bundle install
 
 ## Setup
 
+RBACan 0.5 has two explicit integration modes:
+
+- **Host-owned mode (recommended):** the application owns schema, tenancy, scopes, assignment history,
+  and record policies. Include `Rbacan::Authorizable` and configure adapters. Do not run the generator.
+- **Legacy generated-schema mode:** preserves the 0.4 Active Record API only after conscious
+  `config.legacy_mode = true` opt-in. Its removal methods delete join rows and are unsuitable for
+  immutable assignment-history requirements.
+
+### Host-owned mode
+
+```ruby
+class User < ApplicationRecord
+  include Rbacan::Authorizable
+end
+
+Rbacan.configure do |config|
+  config.role_class = 'Role'
+  config.role_key = :code
+  config.permission_class = 'Permission'
+  config.permission_key = :code
+  config.authorization_adapter = MyAuthorizationAdapter.new
+  config.assignment_adapter = MyAssignmentAdapter.new
+end
+```
+
+Every check receives an explicit immutable value context. Pass stable identifiers or JSON-like
+references, not live Active Record objects:
+
+```ruby
+context = Rbacan::AuthorizationContext.new(
+  tenant: current_tenant.id,
+  property: current_property.id,
+  vertical: current_property.property_type.to_s,
+  subject: { type: reservation.class.name, id: reservation.id },
+  at: Time.current
+)
+
+current_user.can?(:hotel_reservations_read, context: context)
+```
+
+The tenant identifier is required and cannot be nil, boolean, or empty. Tenant, property, vertical,
+subject, metadata, and timestamp values are copied
+and frozen when the context is created. Context identifiers must come from records already loaded
+through the host application's authenticated scope; the authorization adapter resolves and validates
+their relationships under the host's tenancy/RLS rules. The request's `user` remains the live host
+principal object.
+
+Adapters receive one request object. Authorization adapters respond to `allowed?(request)` or `call`;
+assignment adapters respond to `assign(request)` and `revoke(request)`. RBACan never prescribes deletion
+or caching in host-owned mode. Optional context metadata is deeply copied and frozen and accepts only
+hashes, arrays, strings, finite integers/floats, booleans, nil, and symbols.
+
+### Legacy generated-schema mode
+
 **1. Run the generator**
 
 ```bash
@@ -72,12 +126,20 @@ rails db:seed
 
 ## Configuration
 
-The generator creates `config/initializers/rbacan.rb`. All options are optional — the defaults work for a standard Devise setup.
+The generator creates `config/initializers/rbacan.rb`. Generated-schema applications must explicitly
+enable legacy mode; the remaining defaults then work for a standard Devise setup.
 
 ```ruby
 Rbacan.configure do |config|
+  # Conscious opt-in required for the destructive/unscoped 0.4 API while migrating.
+  config.legacy_mode = true
+
   # Your user model name (default: "User")
   config.permittable_class = "User"
+
+  # Host key columns default to :name.
+  # config.role_key = :code
+  # config.permission_key = :code
 
   # Override model class names if you have custom implementations
   # config.role_class             = "Rbacan::Role"
@@ -201,8 +263,19 @@ Include `Rbacan::Authorization` in your `ApplicationController` (or any specific
 ```ruby
 class ApplicationController < ActionController::Base
   include Rbacan::Authorization
+  helper_method :rbacan_authorization_context
+
+  private
+
+  def rbacan_authorization_context
+    AuthorizationContextResolver.call(request: request, user: current_user, subject: @post)
+  end
 end
 ```
+
+The host resolver must build the immutable identifier context only after authenticating the user and
+loading tenant, property, and optional subject records through the authorized scope.
+`AuthorizationContextResolver` is application-defined; RBACan does not infer these values.
 
 Then use `authorize!` or `authorize_role!` as `before_action` callbacks:
 
@@ -255,7 +328,9 @@ config.unauthorized_handler = ->(controller, permission:, role:) {
 
 ## View Helpers
 
-`Rbacan::ViewHelpers` is automatically included in all views. Use `authorized?` to conditionally render content:
+`Rbacan::ViewHelpers` is automatically included in all views. In host-owned mode the host must expose
+`current_user` and `rbacan_authorization_context` to the view. Use `authorized?` to conditionally
+render content:
 
 ```erb
 <% authorized?(:delete_post) do %>
@@ -267,15 +342,11 @@ config.unauthorized_handler = ->(controller, permission:, role:) {
 <% end %>
 ```
 
-You can also use `has_role?` and `has_any_role?` directly in views since they are instance methods on the user:
+You can also use `has_role?` directly in views through the host-owned concern:
 
 ```erb
-<% if current_user.has_role?(:admin) %>
+<% if current_user.has_role?(:admin, context: rbacan_authorization_context) %>
   <%= link_to "Admin Panel", admin_root_path %>
-<% end %>
-
-<% if current_user.has_any_role?(:admin, :moderator) %>
-  <%= link_to "Moderation Queue", moderation_path %>
 <% end %>
 ```
 
@@ -283,24 +354,35 @@ You can also use `has_role?` and `has_any_role?` directly in views since they ar
 
 ## Route Constraints
 
-Restrict access to entire route namespaces based on role or permission. Add constraints in `config/routes.rb`:
+Restrict access to entire route namespaces based on role or permission. Hardened mode requires explicit
+request resolvers:
 
 ```ruby
-# Restrict by role
-constraints Rbacan::RouteConstraint.new(role: :admin) do
+resolve_user = ->(request) { CurrentSessionResolver.call(request) }
+resolve_context = ->(request) { AuthorizationContextResolver.call(request) }
+
+constraints Rbacan::RouteConstraint.new(
+  role: :admin,
+  user_resolver: resolve_user,
+  context_resolver: resolve_context
+) do
   namespace :admin do
     resources :users
     resources :roles
   end
 end
 
-# Restrict by permission
-constraints Rbacan::RouteConstraint.new(permission: :access_dashboard) do
+constraints Rbacan::RouteConstraint.new(
+  permission: :access_dashboard,
+  user_resolver: resolve_user,
+  context_resolver: resolve_context
+) do
   get "/dashboard", to: "dashboard#index"
 end
 ```
 
-The constraint reads the current user from the Warden session (used by Devise). For apps using a manual session, it falls back to looking up `session[:user_id]`.
+Without both resolvers hardened constraints fail closed. In explicitly enabled legacy mode only, the
+constraint retains the 0.4 behavior of reading Warden or `session[:user_id]`.
 
 ---
 

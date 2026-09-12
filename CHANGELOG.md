@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - Unreleased
+
+### Added
+
+- Host-owned authorization through immutable, value-based `Rbacan::AuthorizationContext` and pluggable authorization/assignment adapters.
+- Association-free `Rbacan::Authorizable` concern for applications that own their RBAC schema and lifecycle.
+- Explicit user and context resolvers for hardened route constraints.
+- Stable denial codes on `Rbacan::NotAuthorized` for host-side localization.
+- Configurable `role_key` and `permission_key` columns.
+- Deeply immutable JSON-like authorization metadata and copied immutable target codes.
+
+### Changed
+
+- Hardened mode is the default. Authorization requires an explicit context and fails closed without a host adapter.
+- Destructive/unscoped `Rbacan::Permittable` APIs require explicit `legacy_mode = true` opt-in.
+- Authorization contexts require a tenant and snapshot/freeze JSON-like tenant, property, vertical, and subject identifiers plus their timestamp.
+- Controller and view authorization use the host adapter in hardened mode.
+- Hardened redirect denials resolve their stable code through the host I18n backend.
+- Assignment dispatch rejects missing users or blank roles before invoking the host adapter.
+
+### Compatibility
+
+- Applications using the generated 0.4 schema must consciously enable legacy mode while migrating.
+- No 0.5 artifact has been published yet.
+
 ## [0.4.0] - 2026-04-13
 
 ### Added

@@ -10,12 +10,14 @@ ActiveRecord::Base.establish_connection(
 ActiveRecord::Schema.define do
   create_table :roles, force: true do |t|
     t.string :name, null: false
+    t.string :code
     t.timestamps null: false
   end
   add_index :roles, :name, unique: true
 
   create_table :permissions, force: true do |t|
     t.string :name, null: false
+    t.string :code
     t.timestamps null: false
   end
   add_index :permissions, :name, unique: true
@@ -38,9 +40,20 @@ ActiveRecord::Schema.define do
     t.string :name
     t.timestamps null: false
   end
+
+  create_table :coded_roles, force: true do |t|
+    t.string :code, null: false
+    t.timestamps null: false
+  end
+
+  create_table :coded_permissions, force: true do |t|
+    t.string :code, null: false
+    t.timestamps null: false
+  end
 end
 
 require "rbacan"
+Rbacan.legacy_mode = true
 
 # Manually load engine models (no Rails autoloader in the test env).
 require "rbacan/engine"

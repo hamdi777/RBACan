@@ -1,5 +1,7 @@
 require 'rbacan/version'
 require 'rbacan/not_authorized'
+require 'rbacan/host_authorization'
+require 'rbacan/authorizable'
 require 'rbacan/permittable'
 require 'rbacan/engine'
 require 'rbacan/roles_and_permissions'
@@ -8,13 +10,25 @@ require 'rbacan/view_helpers'
 require 'rbacan/route_constraint'
 
 module Rbacan
+  mattr_accessor :authorization_adapter
+  @@authorization_adapter = nil
+
+  mattr_accessor :assignment_adapter
+  @@assignment_adapter = nil
+
+  # Legacy Active Record mutation/query APIs are opt-in in the hardened API.
+  mattr_accessor :legacy_mode
+  @@legacy_mode = false
+
   mattr_accessor :permittable_class
   @@permittable_class = 'User'
 
   mattr_accessor :role_class
   mattr_accessor :role_table
+  mattr_accessor :role_key
   @@role_class = 'Rbacan::Role'
   @@role_table = 'roles'
+  @@role_key = :name
 
   mattr_accessor :user_role_class
   mattr_accessor :user_role_table
@@ -23,8 +37,10 @@ module Rbacan
 
   mattr_accessor :permission_class
   mattr_accessor :permission_table
+  mattr_accessor :permission_key
   @@permission_class = 'Rbacan::Permission'
   @@permission_table = 'permissions'
+  @@permission_key = :name
 
   mattr_accessor :role_permission_class
   mattr_accessor :role_permission_table
@@ -67,16 +83,16 @@ module Rbacan
   end
 
   def self.create_role(role_name)
-    @@role_class.constantize.create(name: role_name)
+    @@role_class.constantize.create(@@role_key => role_name.to_s)
   end
 
   def self.create_permission(permission_name)
-    @@permission_class.constantize.create(name: permission_name)
+    @@permission_class.constantize.create(@@permission_key => permission_name.to_s)
   end
 
   def self.assign_permission_to_role(role_name, permission_name)
-    chosen_role      = @@role_class.constantize.find_by_name(role_name)
-    given_permission = @@permission_class.constantize.find_by_name(permission_name)
+    chosen_role = @@role_class.constantize.find_by(@@role_key => role_name.to_s)
+    given_permission = @@permission_class.constantize.find_by(@@permission_key => permission_name.to_s)
     @@role_permission_class.constantize.create(
       role_id: chosen_role.id,
       permission_id: given_permission.id

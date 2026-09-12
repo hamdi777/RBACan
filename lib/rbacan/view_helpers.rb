@@ -1,13 +1,18 @@
 module Rbacan
   module ViewHelpers
-    # Renders the block only if the current user has the given permission.
-    #
-    # Usage in views:
-    #   <% authorized?(:publish_post) do %>
-    #     <%= link_to "Publish", publish_post_path(@post) %>
-    #   <% end %>
-    def authorized?(permission, &block)
-      return unless current_user&.can?(permission.to_s)
+    # Renders the block only when the host authorization adapter permits it.
+    def authorized?(permission, context: nil, &block)
+      allowed = if Rbacan.legacy_mode
+                  current_user&.can?(permission.to_s)
+                else
+                  Rbacan.authorized?(
+                    user: current_user,
+                    permission: permission,
+                    context: context || rbacan_authorization_context
+                  )
+                end
+      return unless allowed
+
       capture(&block) if block_given?
     end
   end
